@@ -4,6 +4,7 @@ from transformers import AutoProcessor, AutoModelForCTC
 import torchaudio
 import os
 import tqdm
+from torch.nn.utils.rnn import pad_sequence
 
 class AmadeusDataset(torch.utils.data.Dataset):
   def __init__(self,wav_path):
@@ -20,6 +21,11 @@ class AmadeusDataset(torch.utils.data.Dataset):
         wav_data = wav_data.squeeze(0)
         return wav_data, wav_file
 
+def pad_collate(batch):
+    wav_inputs,wav_files = zip(*batch)
+    wav_inputs = pad_sequence(wav_inputs, batch_first=True, padding_value=0)
+    return wav_inputs,wav_files
+
 def process(args):
     wav_dataset = AmadeusDataset(args.wav_path)
     dataloader = torch.utils.data.DataLoader(wav_dataset, batch_size=args.batch_size, shuffle=False, num_workers=args.num_workers)
@@ -27,8 +33,8 @@ def process(args):
     print("Loading model...")
     processor = AutoProcessor.from_pretrained("thunninoi/wav2vec2-japanese-hiragana-vtuber")
     model = AutoModelForCTC.from_pretrained("thunninoi/wav2vec2-japanese-hiragana-vtuber")
-    print("Model loaded")
     model.to(args.device)
+    print("Model loaded")
 
     print("Start processing...")
     wav_paths = []
