@@ -1,0 +1,1 @@
+tar -cvf /root/autodl-tmp/steinsgate.tar ${WAV_DATAROOT}/

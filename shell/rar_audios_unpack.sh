@@ -1,0 +1,1 @@
+rar x ${RAR_AUDIOS} ${AUDIO_DATAROOT}

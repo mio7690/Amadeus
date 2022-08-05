@@ -1,0 +1,1 @@
+conda create --name Amadeus python=3.7
