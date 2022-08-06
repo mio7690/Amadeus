@@ -28,7 +28,7 @@ def pad_collate(batch):
 
 def process(args):
     wav_dataset = AmadeusDataset(args.wav_path)
-    dataloader = torch.utils.data.DataLoader(wav_dataset, batch_size=args.batch_size, shuffle=False, num_workers=args.num_workers)
+    dataloader = torch.utils.data.DataLoader(wav_dataset, batch_size=args.batch_size, shuffle=False, num_workers=args.num_workers, collate_fn=pad_collate)
 
     print("Loading model...")
     processor = AutoProcessor.from_pretrained("thunninoi/wav2vec2-japanese-hiragana-vtuber")
@@ -39,16 +39,14 @@ def process(args):
     print("Start processing...")
     wav_paths = []
     wav_texts = []
-    cnt = 0
+
     for batch in tqdm.tqdm(dataloader):
-        cnt+=1
-        if cnt>2:
-            break
+
         wav_inputs,wav_files = batch
         wav_inputs = processor(wav_inputs,sampling_rate=16000,return_tensors="pt", padding=True)
         wav_inputs = wav_inputs.to(args.device)
         with torch.no_grad():
-            logits = model(wav_inputs.input_values, attention_mask=wav_inputs.attention_mask).logits
+            logits = model(wav_inputs.input_values.squeeze(0)).logits
         pred_ids = torch.argmax(logits, dim=-1)
         pred_string = processor.batch_decode(pred_ids)
 
