@@ -152,7 +152,7 @@ def get_hparams(init=True):
                       help='Model name')
   
   args = parser.parse_args()
-  model_dir = os.path.join("./logs", args.model)
+  model_dir = os.path.join("/root/autodl-tmp/Amadeus/log", args.model)
 
   if not os.path.exists(model_dir):
     os.makedirs(model_dir)
