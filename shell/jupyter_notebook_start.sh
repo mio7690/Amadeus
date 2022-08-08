@@ -1,0 +1,1 @@
+jupyter notebook --NotebookApp.notebook_dir='.' --allow-root
